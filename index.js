@@ -255,7 +255,13 @@ wss.on("connection", (ws) => {
               body: "Time is up!"
             });
 
-            deleteRoom(roomCode);
+            broadcast(everyone, {
+              action: "roomDeleted",
+              body: `Room ${roomCode} was deleted by the owner`
+            });
+
+            deleteRoom();
+
           }
         }, 1000)
       };
