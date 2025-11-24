@@ -14,8 +14,8 @@ const { WebSocketServer } = require("ws");
 //   }
 // }
 const rooms = {};
-
-const wss = new WebSocketServer({ port: 4000 });
+const PORT = process.env.PORT || 4000;
+const wss = new WebSocketServer({ port: PORT });
 
 /**
  * Safe send wrapper
@@ -460,5 +460,6 @@ wss.on("connection", (ws) => {
     leaveRoom(ws);
   });
 });
+
 
 console.log("WebSocket server running on ws://0.0.0.0:4000");
