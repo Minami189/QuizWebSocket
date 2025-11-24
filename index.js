@@ -344,9 +344,12 @@ wss.on("connection", (ws) => {
       }
 
       const everyone = [room.owner, ...room.clients];
-      broadcast(everyone, {
-        action: "roomDeleted",
-        body: `Room ${roomCode} was deleted by the owner`
+      everyone.forEach(client => {
+        safeSend(client.ws, {
+          action: "roomDeleted",
+          owner: client.ws === room.owner.ws,
+          body: `Room ${roomCode} was deleted by the owner`
+        });
       });
 
       deleteRoom(roomCode);
