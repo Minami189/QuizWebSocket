@@ -255,9 +255,12 @@ wss.on("connection", (ws) => {
               body: "Time is up!"
             });
 
-            broadcast(everyone, {
-              action: "roomDeleted",
-              body: `Room ${roomCode} was deleted by the owner`
+            everyone.forEach(client => {
+              safeSend(client.ws, {
+                action: "roomDeleted",
+                body: `Room ${roomCode} was deleted by the owner`,
+                owner: client.ws === room.owner.ws  // true if this client is the owner
+              });
             });
 
             deleteRoom();
@@ -344,12 +347,10 @@ wss.on("connection", (ws) => {
       }
 
       const everyone = [room.owner, ...room.clients];
-      everyone.forEach(client => {
-        safeSend(client.ws, {
-          action: "roomDeleted",
-          owner: client.ws === room.owner.ws,
-          body: `Room ${roomCode} was deleted by the owner`
-        });
+      broadcast(everyone, {
+        owner: client.ws === room.owner.ws,
+        action: "roomDeleted",
+        body: `Room ${roomCode} was deleted by the owner`
       });
 
       deleteRoom(roomCode);
