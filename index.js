@@ -254,17 +254,7 @@ wss.on("connection", (ws) => {
               action: "sessionEnded",
               body: "Time is up!"
             });
-
-            everyone.forEach(client => {
-              safeSend(client.ws, {
-                action: "roomDeleted",
-                body: `Room ${roomCode} was deleted by the owner`,
-                owner: client.ws === room.owner.ws  // true if this client is the owner
-              });
-            });
-
-            deleteRoom();
-
+            console.log("sessionEnded");
           }
         }, 1000)
       };
@@ -347,10 +337,12 @@ wss.on("connection", (ws) => {
       }
 
       const everyone = [room.owner, ...room.clients];
-      broadcast(everyone, {
-        owner: client.ws === room.owner.ws,
-        action: "roomDeleted",
-        body: `Room ${roomCode} was deleted by the owner`
+      everyone.forEach(client => {
+        safeSend(client.ws, {
+          action: "roomDeleted",
+          body: `Room ${roomCode} was deleted by the owner`,
+          owner: client.ws === room.owner.ws  // true if this client is the owner
+        });
       });
 
       deleteRoom(roomCode);
@@ -406,7 +398,7 @@ wss.on("connection", (ws) => {
 // -----------------------------
   if (action === "finishQuiz") {
     const { roomCode, userEmail, score } = body || {};
-
+    
     if (!roomCode || !userEmail || typeof score !== "number") {
       safeSend(ws, { action: "error", body: "roomCode, userEmail, and numeric score required" });
       return;
@@ -418,10 +410,7 @@ wss.on("connection", (ws) => {
       return;
     }
 
-    if (room.state !== "started") {
-      safeSend(ws, { action: "error", body: "Quiz session not active" });
-      return;
-    }
+
 
     // Create store if not exists
     if (!room.finished) {
@@ -431,7 +420,8 @@ wss.on("connection", (ws) => {
     room.finished[userEmail] = score;
 
     console.log(`User ${userEmail} finished quiz in room ${roomCode} with score ${score}`);
-    const timeRemaining = room.timer.timeRemaining;
+    let timeRemaining = room?.timer?.timeRemaining;
+    if(!timeRemaining) timeRemaining = 0;
     // Notify only the owner
     safeSend(room.owner.ws, {
       action: "userFinished",
@@ -472,4 +462,4 @@ wss.on("connection", (ws) => {
 });
 
 
-console.log("WebSocket server running on ws://0.0.0.0:4000");
+console.log("WebSocket server running on ws://0.0.0.0:" + PORT);
