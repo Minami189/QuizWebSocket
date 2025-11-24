@@ -1,0 +1,12 @@
+{
+  "scripts":{
+    "start": "nodemon index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "nodemon": "^3.1.11",
+    "socket.io": "^4.8.1",
+    "ws": "^8.18.3"
+  }
+}
