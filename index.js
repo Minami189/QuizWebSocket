@@ -151,7 +151,7 @@ wss.on("connection", (ws) => {
     if (action === "join") {
       leaveRoom(ws);
 
-      const { roomCode, userEmail } = body || {};
+      const { roomCode, userEmail, username } = body || {};
       if (!roomCode || !userEmail) {
         safeSend(ws, { action: "error", body: "roomCode and userEmail required to join" });
         return;
@@ -188,7 +188,7 @@ wss.on("connection", (ws) => {
       const allClients = [room.owner, ...room.clients];
       allClients.forEach(client => {
         if (client.ws !== ws) {
-          safeSend(client.ws, { action: "userJoined", body: userEmail });
+          safeSend(client.ws, { action: "userJoined", body: userEmail, username: username });
         }
       });
 
